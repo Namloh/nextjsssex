@@ -17,9 +17,8 @@ export default function Home() {
       body: JSON.stringify({
         email
       })
-    }).then((res: any) => {
-      res.json()
-      alert(res.status)
+    }).then((data) => {
+      alert(data.status)
     })
   }
 
