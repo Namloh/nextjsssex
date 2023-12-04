@@ -1,11 +1,12 @@
 import prisma from "@/lib/prismaHelper";
 import { NextApiRequest } from "next";
 
+/*
 export async function GET(paramreq: NextApiRequest) {
     return new Response("SUP BRAH")
     
 }
-
+*/
 export async function POST(req: any) {
     const {email} = await req.json()
 
