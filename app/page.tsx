@@ -5,19 +5,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import Quote from '../app/models/Quote';
+import Quote from './models/Quote';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
-import Navbar from './Navbar';
+import Navbar from '../comps/Navbar';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 export default function Home() {
   let emptyQuote : Quote = {
     id: null,
     text: '',
+    author: '',
     createdAt: null
   };
   const [quotes, setquotes] = useState<Quote[]>([]);
@@ -129,12 +130,12 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: quote.text, createdAt: quote.createdAt }),
+      body: JSON.stringify({ text: quote.text, author: quote.author, createdAt: quote.createdAt }),
     })
       .then((response) => response.json())
       .then((createdquote) => {
         setquotes([...quotes, createdquote]);
-        setquote({ id: '', text: '', createdAt: null });
+        setquote({ id: '', text: '', author: '', createdAt: null });
         fetch('/api/quotes')
           .then((response) => response.json())
           .then((data) => {
@@ -152,13 +153,38 @@ export default function Home() {
           toast.current?.show({ severity: 'error', summary: 'Error', detail: createdquote.message, life: 3000 });
         }
       });
+      console.log(quotes)
   };
 
   const hideDialog = () => {
     setSubmitted(false);
     setquoteDialog(false);
   };
-
+  const createdAtBodyTemplate = (rowData: Quote) => {
+    // Assuming 'createdAt' is a timestamp property in each quote
+    const timestamp = rowData.createdAt;
+  
+    if (timestamp) {
+      // Convert timestamp to Date object
+      const date = new Date(timestamp);
+  
+      // Format the date using Intl.DateTimeFormat
+      const formattedDate = new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short',
+      }).format(date);
+  
+      return formattedDate;
+    } else {
+      return null; // Handle the case where createdAt is null or undefined
+    }
+  };
+  
   const leftToolbarTemplate = () => {
     return (
         <div className="flex flex-wrap gap-2">
@@ -180,8 +206,8 @@ export default function Home() {
       <div className="m-3">
         <div className="row">
           <div className="flex-auto w-full">
-            <h1>quotes</h1>
-            <Toast ref={toast} />
+            <h1>Quotes</h1>
+            
             <div className="card">
               {loading ? (
                 <div className="flex justify-content-center flex-wrap">
@@ -194,22 +220,25 @@ export default function Home() {
                           dataKey="id"  paginator rows={5} rowsPerPageOptions={[5, 10, 25]}
                           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} quotes">
-                      <Column field="serial_number" header="Serial Number" sortable></Column>
-                      <Column field="product_id" header="Product ID" sortable></Column>
-                      <Column field="createdAt" header="Created" sortable></Column>
-                      <Column body={actionBodyTemplate} exportable={false}></Column>
+                      <Column field="text" header="Quote" sortable></Column>
+                      <Column field="author" header="Author" sortable></Column>
+                      <Column field="createdAt" header="Created" body={createdAtBodyTemplate} sortable></Column>
+                      <Column body={actionBodyTemplate} exportable={false} header="Actions"></Column>
                   </DataTable>
                 </div>
               )}
             </div>
             <Dialog visible={quoteDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="quote Details" modal className="p-fluid" footer={quoteDialogFooter} onHide={hideDialog}>
                 <div className="field">
-                    <label htmlFor="serial_number" className="font-bold">
+                    <label htmlFor="text" className="font-bold">
                         Quote Text
                     </label>
-                    <InputTextarea id="serial_number" value={quote.text} onChange={(e) => onInputChange(e, 'text')} required autoFocus className={classNames({ 'p-invalid': submitted && !quote.text })} />
-                  
-                    {submitted && !quote.text && <small className="p-error">Serial Number is required.</small>}
+                    <InputTextarea id="text" value={quote.text} onChange={(e) => onInputChange(e, 'text')} required autoFocus className={classNames({ 'p-invalid': submitted && !quote.text })} />
+                    <label htmlFor="author" className="font-bold">
+                       Author of the quote
+                    </label>
+                    <InputTextarea id="author" value={quote.author} onChange={(e) => onInputChange(e, 'author')} required autoFocus className={classNames({ 'p-invalid': submitted && !quote.author })} />
+                    {submitted && !quote.text && <small className="p-error">Quote text is required.</small>}
                 </div>           
             </Dialog>
             <Dialog visible={deletequoteDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deletequoteDialogFooter} onHide={hideDeletequoteDialog}>
@@ -222,6 +251,7 @@ export default function Home() {
                     )}
                 </div>
             </Dialog>
+            <Toast ref={toast} />
           </div>
         </div>
       </div>

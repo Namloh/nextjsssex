@@ -11,6 +11,7 @@ generator client {
 model Quote {
   id    String     @id @default(uuid())
   text String  @unique
+  author String @default("anonymous")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

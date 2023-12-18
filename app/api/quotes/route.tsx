@@ -6,6 +6,7 @@ export async function GET(req: Request, res: Response) {
       select: {
         id: true,
         text: true,
+        author: true,
         createdAt: true
       },
     });
@@ -19,7 +20,7 @@ export async function GET(req: Request, res: Response) {
   catch(e) {
     return new Response(
       JSON.stringify({
-        message: "Internal Server Error",
+        message: "Internal Server Error ;)",
       }),
       {
         status: 500,
@@ -38,7 +39,7 @@ export async function POST(req: Request, res: Response) {
     if (!body.text) {
       return new Response(
         JSON.stringify({
-          message: "Serial Number and Product ID must be filled",
+          message: "Quote text must be filled",
         }),
         {
           status: 500,
@@ -84,7 +85,7 @@ export async function DELETE(req: Request, res: Response) {
     });
     return new Response(
       JSON.stringify({
-        message: "quote deleted: " + body.id,
+        message: "Quote deleted: " + body.id,
       }),
       {
         status: 200,
