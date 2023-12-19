@@ -123,8 +123,15 @@ export default function Home() {
 
   const savequote = () => {
     setSubmitted(true);
-    setLoading(true)
-
+    setLoading(true);
+  
+    // Check if the quote text is empty
+    if (!quote.text) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Quote text is required.', life: 3000 });
+      setLoading(false);
+      return;
+    }
+  
     fetch('/api/quotes', {
       method: 'POST',
       headers: {
@@ -139,22 +146,21 @@ export default function Home() {
         fetch('/api/quotes')
           .then((response) => response.json())
           .then((data) => {
-            setquotes(data)
+            setquotes(data);
             setLoading(false);
             if (data.message) {
               toast.current?.show({ severity: 'error', summary: 'Error', detail: data.message, life: 3000 });
             }
           });
-        hideDialog()
+        hideDialog();
         if (createdquote.id) {
-          toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'quote Created: ' + createdquote.id, life: 3000 });
-        }
-        else {
+          toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Quote Created: ' + createdquote.id, life: 3000 });
+        } else {
           toast.current?.show({ severity: 'error', summary: 'Error', detail: createdquote.message, life: 3000 });
         }
       });
-      console.log(quotes)
   };
+  
 
   const hideDialog = () => {
     setSubmitted(false);
@@ -228,17 +234,19 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <Dialog visible={quoteDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="quote Details" modal className="p-fluid" footer={quoteDialogFooter} onHide={hideDialog}>
+            <Dialog visible={quoteDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Quote Details" modal className="p-fluid" footer={quoteDialogFooter} onHide={hideDialog}>
                 <div className="field">
                     <label htmlFor="text" className="font-bold">
-                        Quote Text
+                        Quote Text 
                     </label>
                     <InputTextarea id="text" value={quote.text} onChange={(e) => onInputChange(e, 'text')} required autoFocus className={classNames({ 'p-invalid': submitted && !quote.text })} />
+                    {submitted && !quote.text && <small className="p-error">Quote text is required.</small>}
+                    <br></br>
                     <label htmlFor="author" className="font-bold">
                        Author of the quote
                     </label>
-                    <InputTextarea id="author" value={quote.author} onChange={(e) => onInputChange(e, 'author')} required autoFocus className={classNames({ 'p-invalid': submitted && !quote.author })} />
-                    {submitted && !quote.text && <small className="p-error">Quote text is required.</small>}
+                    <InputTextarea id="author" value={quote.author} onChange={(e) => onInputChange(e, 'author')} autoFocus />
+                  
                 </div>           
             </Dialog>
             <Dialog visible={deletequoteDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deletequoteDialogFooter} onHide={hideDeletequoteDialog}>

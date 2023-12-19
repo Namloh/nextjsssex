@@ -49,10 +49,14 @@ export async function POST(req: Request, res: Response) {
         }
       );
     }
+    if (!body.author) {
+      body.author = "anonymous"
+    }
 
     const user = await prisma.quote.create({
       data: {
           text: body.text,
+          author: body.author,
       },
     });
     return new Response(JSON.stringify(user), {

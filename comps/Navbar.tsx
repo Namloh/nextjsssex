@@ -19,7 +19,7 @@ export default function Navbar() {
       };
 
     const start = (
-        <img alt="logo" src="https://primefaces.org/cdn/primereact/images/logo.png" height="40" className="mr-2"></img>
+        <img alt="logo" src="https://freepngimg.com/thumb/categories/96.png" height="40" className="mr-2"></img>
       );
     
       const end = (

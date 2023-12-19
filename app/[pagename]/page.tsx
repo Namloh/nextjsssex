@@ -7,7 +7,7 @@ interface PageProps {
 export default function Page({ params }: PageProps){
     return(
         <div>
-            <h1>{params.pagename}</h1>
+            <h1>{params.pagename} mf what u tryna do?</h1>
         </div>
     )
 }
